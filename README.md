@@ -78,4 +78,14 @@ El servidor se levanta por defecto en:
 - **POST** `http://localhost:8080/api/carts/:cid/product/:pid`  
   Agrega un producto (por `pid`) a un carrito (por `cid`).
 
+### Uso con Postman
+
+1. Iniciar el servidor (`npm start`).
+2. Abrir Postman.
+3. Crear una nueva request:
+   - Seleccionar el método (GET, POST, PUT, DELETE).
+   - Poner la URL correspondiente (por ejemplo `http://localhost:8080/api/products`).
+   - Para métodos con body (POST/PUT), elegir **Body → raw → JSON** y pegar el JSON.
+4. Presionar **Send** y revisar la respuesta.
+
 

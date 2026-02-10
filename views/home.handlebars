@@ -1,0 +1,17 @@
+<section class="card">
+  <h2>Lista de productos (HTTP)</h2>
+  {{#if products.length}}
+    <ul>
+      {{#each products}}
+        <li>
+          <strong>{{this.title}}</strong>
+          - ${{this.price}}
+          (ID: {{this.id}})
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No hay productos cargados todavía.</p>
+  {{/if}}
+</section>
+

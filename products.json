@@ -1,0 +1,13 @@
+[
+  {
+    "id": 2,
+    "title": "Mouse",
+    "description": "Mouse gamer",
+    "code": "2",
+    "price": 55,
+    "status": true,
+    "stock": 99,
+    "category": "perifericos",
+    "thumbnails": []
+  }
+]
