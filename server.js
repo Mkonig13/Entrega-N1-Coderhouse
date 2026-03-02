@@ -3,6 +3,7 @@ const path = require('path');
 const http = require('http');
 const { engine } = require('express-handlebars');
 const { Server } = require('socket.io');
+const connectDB = require('./database');
 
 const productsRouter = require('./routes/api/products.router');
 const cartsRouter = require('./routes/api/carts.router');
@@ -22,6 +23,9 @@ app.engine(
   engine({
     defaultLayout: 'main',
     layoutsDir: path.join(__dirname, 'views', 'layouts'),
+    helpers: {
+      eq: (a, b) => a === b,
+    },
   })
 );
 app.set('view engine', 'handlebars');
@@ -48,6 +52,10 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Servidor HTTP + WebSocket escuchando en el puerto ${PORT}`);
+// Conexión a la base de datos y arranque del servidor HTTP
+connectDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(`Servidor HTTP + WebSocket escuchando en el puerto ${PORT}`);
+  });
 });
+

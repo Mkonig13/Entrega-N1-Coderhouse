@@ -1,0 +1,32 @@
+<section class="card">
+  <h2>{{product.title}}</h2>
+  <p><strong>Descripción:</strong> {{product.description}}</p>
+  <p><strong>Categoría:</strong> {{product.category}}</p>
+  <p><strong>Precio:</strong> ${{product.price}}</p>
+  <p><strong>Stock:</strong> {{product.stock}}</p>
+  <p><strong>Disponible:</strong> {{#if product.status}}Sí{{else}}No{{/if}}</p>
+
+  {{#if product.thumbnails.length}}
+    <h3>Imágenes</h3>
+    <ul>
+      {{#each product.thumbnails}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    data-add-to-cart
+    data-product-id="{{product._id}}"
+    style="margin-top: 1rem;"
+  >
+    Agregar al carrito
+  </button>
+
+  <p style="margin-top: 1rem;">
+    <a href="/products">Volver a la lista de productos</a>
+  </p>
+</section>
+

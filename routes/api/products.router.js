@@ -1,16 +1,95 @@
 const express = require('express');
 const ProductManager = require('../../managers/ProductManager');
+const Product = require('../../models/product.model');
 
 const router = express.Router();
 const productManager = new ProductManager();
 
-// GET /api/products/ - listar todos los productos
+// GET /api/products/ - listar productos con paginación, filtros y ordenamiento
 router.get('/', async (req, res) => {
   try {
-    const products = await productManager.getProducts();
-    res.json(products);
+    const {
+      limit = 10,
+      page = 1,
+      sort,
+      query,
+    } = req.query;
+
+    const parsedLimit = Number(limit) > 0 ? Number(limit) : 10;
+    const parsedPage = Number(page) > 0 ? Number(page) : 1;
+
+    const filter = {};
+    if (query) {
+      const [field, rawValue] = String(query).split(':');
+      if (field && rawValue) {
+        if (field === 'category') {
+          filter.category = rawValue;
+        } else if (field === 'status') {
+          if (rawValue === 'true' || rawValue === 'false') {
+            filter.status = rawValue === 'true';
+          }
+        }
+      } else {
+        // Modo simplificado: si es true/false => disponibilidad, si no => categoría
+        if (query === 'true' || query === 'false') {
+          filter.status = query === 'true';
+        } else {
+          filter.category = query;
+        }
+      }
+    }
+
+    const sortOption = {};
+    if (sort === 'asc') {
+      sortOption.price = 1;
+    } else if (sort === 'desc') {
+      sortOption.price = -1;
+    }
+
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const [products, totalDocs] = await Promise.all([
+      Product.find(filter)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(parsedLimit)
+        .lean(),
+      Product.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.max(Math.ceil(totalDocs / parsedLimit), 1);
+    const hasPrevPage = parsedPage > 1;
+    const hasNextPage = parsedPage < totalPages;
+    const prevPage = hasPrevPage ? parsedPage - 1 : null;
+    const nextPage = hasNextPage ? parsedPage + 1 : null;
+
+    const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+    const buildLink = (targetPage) => {
+      if (!targetPage) return null;
+      const params = new URLSearchParams();
+      params.set('page', targetPage);
+      if (parsedLimit) params.set('limit', parsedLimit);
+      if (sort) params.set('sort', sort);
+      if (query) params.set('query', query);
+      return `${baseUrl}/?${params.toString()}`;
+    };
+
+    res.json({
+      status: 'success',
+      payload: products,
+      totalPages,
+      prevPage,
+      nextPage,
+      page: parsedPage,
+      hasPrevPage,
+      hasNextPage,
+      prevLink: hasPrevPage ? buildLink(prevPage) : null,
+      nextLink: hasNextPage ? buildLink(nextPage) : null,
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los productos', details: error.message });
+    res
+      .status(500)
+      .json({ status: 'error', error: 'Error al obtener los productos', details: error.message });
   }
 });
 

@@ -1,0 +1,38 @@
+<section class="card">
+  <h2>Carrito {{cart._id}}</h2>
+
+  {{#if cart.products.length}}
+    <ul>
+      {{#each cart.products}}
+        <li>
+          <strong>{{this.product.title}}</strong>
+          - ${{this.product.price}}
+          - Cantidad: {{this.quantity}}
+          |
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-remove-from-cart
+            data-cart-id="{{../cart._id}}"
+            data-product-id="{{this.product._id}}"
+          >
+            Quitar
+          </button>
+        </li>
+      {{/each}}
+    </ul>
+    <p style="margin-top: 1rem;">
+      <button
+        type="button"
+        class="btn btn-danger"
+        data-clear-cart
+        data-cart-id="{{cart._id}}"
+      >
+        Vaciar carrito
+      </button>
+    </p>
+  {{else}}
+    <p>El carrito está vacío.</p>
+  {{/if}}
+</section>
+
